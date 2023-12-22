@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: MAPP_Strabismus_api
+    ports:
+      - '8000:8000'
+    restart: always

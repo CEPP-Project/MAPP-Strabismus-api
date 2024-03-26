@@ -18,6 +18,8 @@ services:
       - POSTGRES_PASSWORD=test
       - POSTGRES_USER=test
       - POSTGRES_DB=starbismus_db
+      - TZ=Asia/Bangkok
+      - PGTZ=Asia/Bangkok
     volumes:
       - local_pgdata:/var/lib/postgresql/data
     restart: unless-stopped

@@ -52,7 +52,7 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
         print(error)
         rand_num1 = round(random.uniform(0, 1), 1)
         rand_num2 = round(1-rand_num1, 1)
-        result = [True if rand_num2 > 0.5 else False, (rand_num1, rand_num2)] # if error mock data
+        result = [True if rand_num2 > 0.5 else False, {str(rand_num1): rand_num2}] # if error mock data
 
     # print(authorization)
     if authorization is not None:

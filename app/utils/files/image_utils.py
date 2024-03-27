@@ -2,7 +2,8 @@ from pathlib import Path
 from PIL import Image
 
 current_dir = Path(__file__).parent
-TEMP_DIR = current_dir.parent / 'tmp'
+parent_dir = current_dir.parent
+TEMP_DIR = parent_dir.parent / 'tmp'
 
 def crop_and_save_upload_file(file_location: Path) -> None:
     try:

@@ -50,8 +50,8 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
         return {"error": "Can not detect eye."}
     except Exception as error:
         print(error)
-        rand_num2 = round(random.uniform(0.5, 0.9), 2)
-        rand_num1 = round(1-rand_num2, 2)
+        rand_num1 = round(random.uniform(0.5, 0.9), 2)
+        rand_num2 = round(1-rand_num1, 2)
         result = [True if rand_num2 > 0.5 else False, [rand_num1, rand_num2]] # if error mock data
         print("Error result: ", result)
 

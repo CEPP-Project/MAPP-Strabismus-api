@@ -176,4 +176,4 @@ def predict_strabismus(df,drop=False):
         print('Have risk of Strabismus')
     else:
         print('No risk of Strabismus')
-    return [bool(prediction), predict_prob]
+    return [bool(prediction), predict_prob.tolist()]

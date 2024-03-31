@@ -65,4 +65,6 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
         db.commit()
         db.refresh(new_history)
 
+    print(result)
+
     return {"result": result}

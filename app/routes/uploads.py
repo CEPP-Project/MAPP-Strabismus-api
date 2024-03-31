@@ -39,12 +39,12 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
     try:
         pred3 = predict_3gazes(model_setting.models_paths, eye_img, 'patient_id', model_setting.cls_dicts)
         addRT = add_ratio(pivot_df(pred3))
-        df = addRT.copy()
-        df.insert(22, 'RR_rt2', 0.09253750849210249)
-        df.insert(23, 'RR_rt3', 0.28542830303351974)
-        df = df.fillna(0)
-        result = predict_strabismus(df)
-        # result = predict_strabismus(addRT)
+        # df = addRT.copy()
+        #df.insert(22, 'RR_rt2', 0.09253750849210249)
+        #df.insert(23, 'RR_rt3', 0.28542830303351974)
+        # df = df.fillna(0)
+        # result = predict_strabismus(df)
+        result = predict_strabismus(addRT)
     except KeyError as error:
         print(error)
         return {"error": "Can not detect eye."}
@@ -52,7 +52,8 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
         print(error)
         rand_num1 = round(random.uniform(0, 1), 1)
         rand_num2 = round(1-rand_num1, 1)
-        result = [True if rand_num2 > 0.5 else False, {str(rand_num1): rand_num2}] # if error mock data
+        result = [True if rand_num2 > 0.5 else False, [rand_num1, rand_num2]] # if error mock data
+        print("Error result: ", result)
 
     # print(authorization)
     if authorization is not None:
@@ -66,5 +67,4 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
         db.refresh(new_history)
 
     print(result)
-
     return {"result": result}

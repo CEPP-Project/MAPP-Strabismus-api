@@ -1,0 +1,9 @@
+venv/
+.git/
+.gitignore
+__pycache__/
+app/uploads
+app/tmp
+ai_models/
+runs/
+README.md

@@ -6,36 +6,28 @@ services:
       dockerfile: Dockerfile
     container_name: MAPP_Strabismus_api
     ports:
-      - '8000:8000'
-    restart: unless-stopped
-
-  db:
-    image: postgres:16-alpine
-    container_name: postgres_db
-    ports:
-      - '5432:5432'
+      - '3000:8000'
     environment:
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_USER=test
-      - POSTGRES_DB=starbismus_db
       - TZ=Asia/Bangkok
       - PGTZ=Asia/Bangkok
     volumes:
-      - local_pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
+      - ./ai_models:/code/ai_models:ro
+      - ./app/uploads:/code/app/uploads
+      - ./app/tmp:/code/app/tmp
+    restart: always
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin4_container
-    ports:
-      - "8888:80"
+  db:
+    image: postgres:16-alpine
+    container_name: MAPP_Strabismus_postgres_db
     environment:
-      PGADMIN_DEFAULT_EMAIL: test@test.com
-      PGADMIN_DEFAULT_PASSWORD: test
+      - POSTGRES_PASSWORD=change_this
+      - POSTGRES_USER=change_this
+      - POSTGRES_DB=change_this
+      - TZ=Asia/Bangkok
+      - PGTZ=Asia/Bangkok
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    restart: unless-stopped
+      - MAPP_Strabismus_pgdata:/var/lib/postgresql/data
+    restart: always
 
 volumes:
-  local_pgdata:
-  pgadmin-data:
+  MAPP_Strabismus_pgdata:

@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: MAPP_Strabismus_api
+    ports:
+      - '8000:8000'
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: MAPP_Strabismus_postgres_db
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_USER=test
+      - POSTGRES_DB=starbismus_db
+      - TZ=Asia/Bangkok
+      - PGTZ=Asia/Bangkok
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: MAPP_Strabismus_pgadmin4
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: test@test.com
+      PGADMIN_DEFAULT_PASSWORD: test
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    restart: unless-stopped
+
+volumes:
+  local_pgdata:
+  pgadmin-data:

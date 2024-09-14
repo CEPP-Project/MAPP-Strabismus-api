@@ -12,6 +12,7 @@ services:
       - PGTZ=Asia/Bangkok
     volumes:
       - ./ai_models:/code/ai_models:ro
+      - ./runs:/code/runs
       - ./app/uploads:/code/app/uploads
       - ./app/tmp:/code/app/tmp
     restart: always

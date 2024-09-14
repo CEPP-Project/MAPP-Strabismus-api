@@ -40,20 +40,28 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
         pred3 = predict_3gazes(model_setting.models_paths, eye_img, 'patient_id', model_setting.cls_dicts)
         addRT = add_ratio(pivot_df(pred3))
         # df = addRT.copy()
-        #df.insert(22, 'RR_rt2', 0.09253750849210249)
-        #df.insert(23, 'RR_rt3', 0.28542830303351974)
+        # try insert missing value
+        # df.insert(22, 'RR_rt2', 0.09253750849210249)
+        # df.insert(23, 'RR_rt3', 0.28542830303351974)
         # df = df.fillna(0)
         # result = predict_strabismus(df)
         result = predict_strabismus(addRT)
     except KeyError as error:
+        print("--- Error ---")
+        print("Error name:", error.__class__.__name__)
         print(error)
+        print("-------------")
         return {"error": "Can not detect eye."}
     except Exception as error:
+        print("--- Error ---")
+        print("Error name:", error.__class__.__name__)
         print(error)
-        rand_num1 = round(random.uniform(0.5, 0.9), 2)
-        rand_num2 = round(1-rand_num1, 2)
-        result = [True if rand_num2 > 0.5 else False, [rand_num1, rand_num2]] # if error mock data
-        print("Error result: ", result)
+        print("-------------")
+        # rand_num1 = round(random.uniform(0.5, 0.9), 2)
+        # rand_num2 = round(1-rand_num1, 2)
+        # result = [True if rand_num2 > 0.5 else False, [rand_num1, rand_num2]] # if error mock data
+        # print("Error result: ", result)
+        return {"error": "Error when fitting data"}
 
     # print(authorization)
     if authorization is not None:

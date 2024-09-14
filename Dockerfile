@@ -13,7 +13,7 @@ COPY ./requirements.txt /code/requirements.txt
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
 
-COPY ./.env /code/.env
+COPY ./.env.prod /code/.env
 COPY ./app /code/app
 
 # Starting API

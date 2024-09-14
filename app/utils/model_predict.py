@@ -61,8 +61,9 @@ def predict_3gazes(models_paths, eye_img, landmark_id, cls_dicts):
     predict_df = predict(models_paths['right'], eye_img[5], landmark_id+'RR', cls_dicts['right'])
     landmarks_df = pd.concat([predict_df, landmarks_df]).reset_index(drop=True)
 
-    print("landmarks_df")
+    print("--- landmarks_df ---")
     print(landmarks_df)
+    print("--------------------")
 
     return landmarks_df
         
@@ -144,18 +145,19 @@ def add_ratio(df):
     return df
 
 def predict_strabismus(df,drop=False):
-    print("Predict starbismus")
+    print("--- Predict starbismus ---")
     df = df.copy()
     df = df.reset_index(drop=True)
     X = df.drop(columns=['image_name']).copy()
     
-    print(X)
+    print("--- Show data for Fitting Model ---")
+    print(X.to_string())
     # mean = float(X.mean(axis=1))
     # X = X.fillna(mean)
     # X = np.array(X, dtype="float32")
     y = None
 
-    print("Loading model")
+    print("--- Loading model ---")
     if drop == False:
         model = pickle.load(open(setting.PREDICT_MODEL_PATH, 'rb'))
     else:
@@ -164,11 +166,11 @@ def predict_strabismus(df,drop=False):
     # model_drop = pickle.load(open(setting.PREDICT_DROP_MODEL_PATH, 'rb'))
 
 
-    print("Fitting Model")
+    print("--- Fitting Model ---")
     prediction = model.predict(X) #X,y decisiontree
     predict_prob = model.predict_proba(X)
 
-    # print("Fitting Drop Model")
+    # print("--- Fitting Drop Model ---")
     # prediction = model_drop.predict(X) #X,y decisiontree
     # predict_prob = model_drop.predict_proba(X)
 

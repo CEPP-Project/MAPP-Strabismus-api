@@ -10,16 +10,16 @@ user_router = APIRouter(
     tags=['User']
 )
 
-@user_router.get("/me")
+@user_router.get('/me')
 async def get_my_user(current_user: schemas.UserInDB = Depends(get_current_user)):
     return current_user
 
-@user_router.get("/history")
+@user_router.get('/history')
 async def get_my_history(current_user: schemas.UserInDB = Depends(get_current_user), db: Session = Depends(get_db)):
     history = db.query(models.Historys).filter_by(user_id=current_user.user_id).order_by(models.Historys.timestamp.desc()).all()
     return history
 
-@user_router.get("/graph")
+@user_router.get('/graph')
 async def get_my_graph(current_user: schemas.UserInDB = Depends(get_current_user), db: Session = Depends(get_db)):
     graph_data = db.query(models.Historys).filter_by(user_id=current_user.user_id).order_by(models.Historys.timestamp.desc()).limit(7).all()
     return graph_data

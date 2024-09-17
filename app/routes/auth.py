@@ -12,11 +12,11 @@ auth_router = APIRouter(
 )
 
 # Right now, we don't need to register on prod
-# @auth_router.post("/register")
+# @auth_router.post('/register')
 # async def register(user: UserCreate, db: Session = Depends(get_db)):
 #     existing_user = db.query(models.Users).filter_by(username=user.username).first()
 #     if existing_user:
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already registered")
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Username already registered')
     
 #     hashed_password = get_hashed_password(user.password)
 #     new_user = models.Users(username=user.username, password=hashed_password)
@@ -25,21 +25,21 @@ auth_router = APIRouter(
 #     db.commit()
 #     db.refresh(new_user)
 
-#     return {"message": "User created successfully"}
+#     return {'message': 'User created successfully'}
 
-@auth_router.post("/login", response_model=schemas.TokenSchema)
+@auth_router.post('/login', response_model=schemas.TokenSchema)
 async def login(request: UserCreate, db: Session = Depends(get_db)):
     user = db.query(models.Users).filter_by(username=request.username).first()
     if user is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect username or password")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Incorrect username or password')
     hashed_pass = user.password
     if not verify_password(request.password, hashed_pass):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect username or password"
+            detail='Incorrect username or password'
         )
     
     access=create_access_token(user.user_id)
     return {
-        "access_token": access,
+        'access_token': access,
     }

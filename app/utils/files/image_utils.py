@@ -31,4 +31,4 @@ def crop_and_save_upload_file(file_location: Path) -> None:
         return [str(newfile_left_location), str(newfile_right_location)]
 
     except Exception as error:
-        print("Error occured when croping file :", error)
+        print('Error occured when croping file :', error)

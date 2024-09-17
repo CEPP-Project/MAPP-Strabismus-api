@@ -28,7 +28,7 @@ services:
     image: dpage/pgadmin4
     container_name: MAPP_Strabismus_pgadmin4
     ports:
-      - "8888:80"
+      - '8888:80'
     environment:
       PGADMIN_DEFAULT_EMAIL: test@test.com
       PGADMIN_DEFAULT_PASSWORD: test

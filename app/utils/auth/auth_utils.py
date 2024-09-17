@@ -10,12 +10,12 @@ from app.utils.auth.auth_bearer import JWTBearer
 import app.db.models as models
 import app.db.schemas as schemas
 
-setting = get_settings()
-jwt_expire = setting.ACCESS_TOKEN_EXPIRE_MINUTES
-alg = "HS256"
-jwt_secret = setting.JWT_SECRET_KEY
+settings = get_settings()
+jwt_expire = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+alg = 'HS256'
+jwt_secret = settings.JWT_SECRET_KEY
 
-password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+password_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 def get_hashed_password(password: str) -> str:
     return password_context.hash(password)
@@ -31,7 +31,7 @@ def create_access_token(subject: Union[str, Any], expires_delta: int = None) -> 
         expires_delta = datetime.now(timezone.utc) + timedelta(minutes=jwt_expire)
          
     
-    to_encode = {"exp": expires_delta, "sub": str(subject)}
+    to_encode = {'exp': expires_delta, 'sub': str(subject)}
     encoded_jwt = jwt.encode(to_encode, jwt_secret, alg)
      
     return encoded_jwt
@@ -39,12 +39,12 @@ def create_access_token(subject: Union[str, Any], expires_delta: int = None) -> 
 async def get_current_user(token: str = Depends(JWTBearer()), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
+        detail='Could not validate credentials',
+        headers={'WWW-Authenticate': 'Bearer'},
     )
     try:
         payload = jwt.decode(token, jwt_secret, algorithms=alg)
-        user_id: str = payload.get("sub")
+        user_id: str = payload.get('sub')
         if user_id is None:
             raise credentials_exception
         token_data = schemas.TokenData(user_id=user_id)

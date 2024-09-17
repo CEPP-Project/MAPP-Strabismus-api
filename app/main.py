@@ -10,9 +10,9 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=['*'],
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=['GET', 'POST'],
     )
 
 models.Base.metadata.create_all(bind=engine)

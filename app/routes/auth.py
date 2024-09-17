@@ -11,20 +11,21 @@ auth_router = APIRouter(
     tags=['Auth']
 )
 
-@auth_router.post("/register")
-async def register(user: UserCreate, db: Session = Depends(get_db)):
-    existing_user = db.query(models.Users).filter_by(username=user.username).first()
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already registered")
+# Right now, we don't need to register on prod
+# @auth_router.post("/register")
+# async def register(user: UserCreate, db: Session = Depends(get_db)):
+#     existing_user = db.query(models.Users).filter_by(username=user.username).first()
+#     if existing_user:
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already registered")
     
-    hashed_password = get_hashed_password(user.password)
-    new_user = models.Users(username=user.username, password=hashed_password)
+#     hashed_password = get_hashed_password(user.password)
+#     new_user = models.Users(username=user.username, password=hashed_password)
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+#     db.add(new_user)
+#     db.commit()
+#     db.refresh(new_user)
 
-    return {"message": "User created successfully"}
+#     return {"message": "User created successfully"}
 
 @auth_router.post("/login", response_model=schemas.TokenSchema)
 async def login(request: UserCreate, db: Session = Depends(get_db)):

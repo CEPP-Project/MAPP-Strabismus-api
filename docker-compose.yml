@@ -5,10 +5,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - user=${USER}
-        - group=${GROUP}
-        - uid=${UID}
-        - gid=${GID}
+        - user=${APP_USER}
+        - group=${APP_GROUP}
+        - uid=${APP_UID}
+        - gid=${APP_GID}
     container_name: MAPP_Strabismus_api
     ports:
       - '3000:8000'

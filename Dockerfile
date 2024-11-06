@@ -18,6 +18,9 @@ ARG gid=1000
 RUN groupadd -g ${gid} ${group}
 RUN useradd -u ${uid} -g ${group} -s /bin/false -m ${user}
 
+# Add user local binary to PATH
+ENV PATH="/home/${user}/.local/bin:${PATH}"
+
 WORKDIR /code
 
 # change directory permission and switch user

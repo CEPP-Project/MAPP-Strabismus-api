@@ -6,7 +6,7 @@ from app.routes.uploads import uploads_router
 from app.routes.user import user_router
 from app.routes.auth import auth_router
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
 app.add_middleware(
     CORSMiddleware,

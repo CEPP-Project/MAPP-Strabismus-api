@@ -1,10 +1,11 @@
 from fastapi import HTTPException, UploadFile, status
 
 def validate_file_size_type(file: UploadFile) -> None:
-    FILE_SIZE = 2097152 # 2MB
+    FILE_SIZE = 10485760 # 10MB
 
     try:
         if file.filename.split('.')[-1] not in ['png', 'jpeg', 'jpg'] or file.content_type not in ['image/png', 'image/jpeg', 'image/jpg']:
+            print('Error unsupported file typpe', file.filename.split('.')[-1])
             raise HTTPException(
                 status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
                 detail='Unsupported file type',
@@ -14,6 +15,7 @@ def validate_file_size_type(file: UploadFile) -> None:
         for chunk in file.file:
             real_file_size += len(chunk)
             if real_file_size > FILE_SIZE:
+                print('Error file is too large:', real_file_size, 'B')
                 raise HTTPException(
                     status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, 
                     detail='File is too large'

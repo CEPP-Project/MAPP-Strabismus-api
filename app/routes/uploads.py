@@ -24,10 +24,12 @@ UPLOAD_DIR = current_dir.parent / 'uploads'
 model_settings = get_model_settings()
 settings = get_settings()
 
-eye_img = []
-
 @uploads_router.post('/detect') # change /upload-images to /detect --> Path: /uploads/detect
 async def detect_strabismus(files: list[UploadFile], authorization: Annotated[str | None, Header()] = None ,db: Session = Depends(get_db)):
+
+    # eye images need to reset everytime
+    eye_img = []
+
     for index, file in enumerate(files):
         validate_file_size_type(file)
         file_location = UPLOAD_DIR / f'{index}_{file.filename}'

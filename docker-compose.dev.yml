@@ -17,7 +17,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=test
       - POSTGRES_USER=test
-      - POSTGRES_DB=starbismus_db
+      - POSTGRES_DB=test_db
       - TZ=Asia/Bangkok
       - PGTZ=Asia/Bangkok
     volumes:

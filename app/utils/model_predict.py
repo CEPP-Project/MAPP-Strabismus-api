@@ -203,7 +203,9 @@ def final_preprocess(old_df,new_df,file_name=None):
             elif cls_name == 'L7':
                 new_df.loc[index, 'L7-L'] = x
             elif cls_name == 'L8':
-                new_df.loc[index, 'L8-L'] = x 
+                new_df.loc[index, 'L8-L'] = x
+            elif cls_name == 'L9':
+                new_df.loc[index, 'LC-L'] = x     
             elif cls_name == 'LC':
                 new_df.loc[index, 'LC-L'] = x             
             elif cls_name == 'M1':
@@ -222,6 +224,8 @@ def final_preprocess(old_df,new_df,file_name=None):
                 new_df.loc[index, 'M7-L'] = x
             elif cls_name == 'M8':
                 new_df.loc[index, 'M8-L'] = x
+            elif cls_name == 'M9':
+                new_df.loc[index, 'MC-L'] = x
             elif cls_name == 'MC':
                 new_df.loc[index, 'MC-L'] = x
             elif cls_name == 'R1':
@@ -240,6 +244,8 @@ def final_preprocess(old_df,new_df,file_name=None):
                 new_df.loc[index, 'R7-L'] = x
             elif cls_name == 'R8':
                 new_df.loc[index, 'R8-L'] = x
+            elif cls_name == 'R9':
+                new_df.loc[index, 'RC-L'] = x
             elif cls_name == 'RC':
                 new_df.loc[index, 'RC-L'] = x
             else:
@@ -264,6 +270,8 @@ def final_preprocess(old_df,new_df,file_name=None):
                 new_df.loc[index, 'L7-R'] = x
             elif cls_name == 'L8':
                 new_df.loc[index, 'L8-R'] = x 
+            elif cls_name == 'L9':
+                new_df.loc[index, 'LC-R'] = x
             elif cls_name == 'LC':
                 new_df.loc[index, 'LC-R'] = x     
             elif cls_name == 'M1':
@@ -282,6 +290,8 @@ def final_preprocess(old_df,new_df,file_name=None):
                 new_df.loc[index, 'M7-R'] = x
             elif cls_name == 'M8':
                 new_df.loc[index, 'M8-R'] = x
+            elif cls_name == 'M9':
+                new_df.loc[index, 'MC-R'] = x
             elif cls_name == 'MC':
                 new_df.loc[index, 'MC-R'] = x
             elif cls_name == 'R1':
@@ -300,6 +310,8 @@ def final_preprocess(old_df,new_df,file_name=None):
                 new_df.loc[index, 'R7-R'] = x
             elif cls_name == 'R8':
                 new_df.loc[index, 'R8-R'] = x
+            elif cls_name == 'R9':
+                new_df.loc[index, 'RC-R'] = x
             elif cls_name == 'RC':
                 new_df.loc[index, 'RC-R'] = x
             else:
@@ -330,8 +342,9 @@ def predict_strabismus(pred_input,models):
         predict_proba = model.predict_proba(pred_input)
 
         # Store all predict result and probabilities
-        all_predict_results.append(predict_result)
-        all_predict_proba.append(predict_proba)
+        if 0.2 <= abs(predict_proba[0][0]-predict_proba[0][1]):
+            all_predict_results.append(predict_result)
+            all_predict_proba.append(predict_proba)
 
     # calculate average probabilities 
     all_predict_proba = np.array(all_predict_proba)

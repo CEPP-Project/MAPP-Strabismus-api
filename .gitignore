@@ -1,6 +1,8 @@
 venv/
 .env*
+.dockerenv
 !.env.example
+!.dockerenv.example
 __pycache__/
 ai_models/
 new_ai_models/

@@ -1,0 +1,11 @@
+# Docker environment
+# Database for application
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
+
+# User and Group for application
+APP_USER=
+APP_GROUP=
+APP_UID=
+APP_GID=

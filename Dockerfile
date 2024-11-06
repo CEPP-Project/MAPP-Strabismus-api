@@ -29,7 +29,7 @@ COPY --chown=${user}:${group} ./requirements.txt /code/requirements.txt
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
 
-COPY --chown=${user}:${group} ./.env.prod /code/.env
+COPY --chown=${user}:${group} ./.env /code/.env
 COPY --chown=${user}:${group} ./app /code/app
 
 EXPOSE 8000

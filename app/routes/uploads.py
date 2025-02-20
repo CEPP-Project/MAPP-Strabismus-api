@@ -32,13 +32,10 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
 
     for index, file in enumerate(files):
         validate_file_size_type(file)
-        file_location = UPLOAD_DIR / f'{index}_{file.filename}'
-    
+        file_location = UPLOAD_DIR / f'{index}_{file.filename}'   
+
         save_upload_file(file, file_location)
-        crop_file_location = crop_and_save_upload_file(file_location)
- 
-        eye_img.append(crop_file_location[0])
-        eye_img.append(crop_file_location[1])
+        eye_img.append(str(file_location))
 
     try:
         print('eye_img', eye_img)

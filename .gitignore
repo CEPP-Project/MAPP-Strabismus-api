@@ -5,5 +5,5 @@ venv/
 !.dockerenv.example
 __pycache__/
 ai_models/
-new_ai_models/
+ai_models_new/
 runs/

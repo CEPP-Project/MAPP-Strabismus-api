@@ -90,7 +90,7 @@ def create_empty_df(df,gaze):
 
 def fill_w_rules(row,col):
     rules = {
-            'L1': [0,0],
+            'L1': ['L2','L6'],
             'L2': ['L6','L7'],
             'L3': ['L5','L8'],
             'L4': [155,155],
@@ -111,7 +111,7 @@ def fill_w_rules(row,col):
             'R1': [0,0],
             'R2': ['R6','R7'],
             'R3': ['R5','R8'],
-            'R4': [155,155],
+            'R4': ['R3','R5'],
             'R5': ['R3','R8'],
             'R6': ['R2','R7'],
             'R7': ['R2','R6'],
@@ -132,7 +132,7 @@ def fill_w_rules(row,col):
             lm2 = row[lm2+'-L']    
         except:
             pass
-    return max([lm1,lm2])
+    return (lm1+lm2)//2
 
 def detect_landmarks_with_rules(df):
     df = df.copy()
@@ -140,6 +140,9 @@ def detect_landmarks_with_rules(df):
         for col, val in row.items():
             if col != 'image_name' and col != 'strabismus':
                 if val != val: # check for nan values
+                    print('warning!!... %s != val'%(val))
+                    print('replace %s from loc [%s:%s] with %s  val'%(df.loc[i,col],i,col,fill_w_rules(row,col)))
+                    
                     df.loc[i,col] = fill_w_rules(row,col)
     return df
 
@@ -334,26 +337,27 @@ def predict_strabismus(pred_input,models):
     all_predict_results = []
     all_predict_proba = []
 
-    for model_name, dump_model in models.items():
-        model = pickle.loads(dump_model)
-        
-        # Predict result and probabilities
-        predict_result = model.predict(pred_input)
-        predict_proba = model.predict_proba(pred_input)
+    for i in models:
+        try:
+            model = i['model']
 
-        # Store all predict result and probabilities
-        if 0.2 <= abs(predict_proba[0][0]-predict_proba[0][1]):
-            all_predict_results.append(predict_result)
-            all_predict_proba.append(predict_proba)
+            # Predict result and probabilities
+            predict_result = model.predict(pred_input)
+            predict_proba = model.predict_proba(pred_input)
+            print(predict_proba)
+            # Store all predict result and probabilities
 
+            if 0.2 <= abs(predict_proba[0][0]-predict_proba[0][1]):
+                all_predict_results.append(predict_result)
+                all_predict_proba.append(predict_proba)
+                # print(i['model_name'],'predict_result:',predict_result)
+                # print(i['model_name'],'predict_proba:', predict_proba[0])
+
+        except:
+            pass
     # calculate average probabilities 
     all_predict_proba = np.array(all_predict_proba)
     average_proba = np.mean(all_predict_proba, axis=0)
     
-    common_pred = max(all_predict_results, key=all_predict_results.count)
-
-    if common_pred[0] == False:
-        strabismus = False
-    elif common_pred[0] == True:
-            strabismus = True
+    strabismus = average_proba[0][1]>average_proba[0][0]
     return [strabismus, average_proba.tolist()[0]]

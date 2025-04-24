@@ -82,10 +82,10 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
         final_combine = final_combine[model_settings.ratio_com]
         final_combine.dropna(inplace=True)
 
-        # predict strabismus with top 5 best MLs
+        # predict strabismus with top MLs
         preidct_image = final_combine.head(1).drop(columns=['image_name','strabismus']).copy()
-        top5ml = pd.read_pickle(read_latest_file(settings.ML_PATH,'top5ml'))
-        strabismus_prediction = predict_strabismus(preidct_image,top5ml)
+        topml = pd.read_pickle(read_latest_file(settings.ML_PATH,'topml[DT-RF-KNN]'))
+        strabismus_prediction = predict_strabismus(preidct_image,topml) #result = [True/False, %AvgConfidence]
         if strabismus_prediction[0] == 'Undetectable':
             return {'error': 'Undetectable'}
         
@@ -104,7 +104,7 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
         print('Error name:', error.__class__.__name__)
         print(error)
         print('-------------')
-        return {'error': 'Something went wrong'}
+        return {'error': 'Cannot Detect Landmarks'}
 
     if authorization is not None:
         payload = decodeJWT(authorization.split()[1]) # split Bearer

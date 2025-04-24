@@ -90,7 +90,7 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
             return {'error': 'Undetectable'}
         
         print("strabismus result =", strabismus_prediction)
-        result = strabismus_prediction
+        result = [bool(strabismus_prediction[0]), [float(x) for x in strabismus_prediction[1]]]
 
     # Error logging
     except KeyError as error:

@@ -6,4 +6,5 @@ venv/
 __pycache__/
 ai_models/
 ai_models_new/
+ai_models_latest/
 runs/

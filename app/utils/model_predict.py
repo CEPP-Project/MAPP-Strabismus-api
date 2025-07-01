@@ -11,20 +11,17 @@ def RTDETR_prediction(model_path,images_url,cls_dict):
     model = RTDETR(model_path)
     append_df = pd.DataFrame(columns=['image_name','xmin', 'ymin','xmax', 'ymax','confidence','class','cls_name'])
     for url,name in images_url:
-
-        # detect eye landmarks
+# detect eye landmarks
         detect_im = model.predict(url)
         crash = None
         j = 0
         while crash == None:
             try:
-
-                # extract each landmarks
+# extract each landmarks
                 boxj = detect_im[0].boxes[j].xyxy[0].cpu().detach().numpy()
                 clsj = detect_im[0].boxes[j].cls.cpu().detach().numpy()[0]
                 confj = detect_im[0].boxes[j].conf.cpu().detach().numpy()[0]
-
-                # update & save
+# update & save
                 append_df = update_df(append_df,cls_dict,name,boxj,clsj,confj)
 
                 j += 1
@@ -42,7 +39,6 @@ def read_latest_file(file_path,file_name):
     return file_name
 
 def update_df(df,cls_dict,name,box,cls,conf):
-
     # create temp dataframe
     new_df = pd.Series({'image_name':name,
                         'xmin' : box[0],
@@ -71,7 +67,6 @@ def prediction_preprocess(prediction,file_name=None):
     return df
 
 def create_empty_df(df,gaze):
-
     # remove left & right eyes suffixes
     replace_name = df['image_name'].str.replace('-'+gaze+'-RE','')
     replace_name = replace_name.str.replace('-'+gaze+'-LE','')
@@ -87,64 +82,6 @@ def create_empty_df(df,gaze):
     empty_df.reset_index(inplace=True)
     empty_df = empty_df.drop(columns=['index'])
     return empty_df
-
-def fill_w_rules(row,col):
-    rules = {
-            'L1': ['L2','L6'],
-            'L2': ['L6','L7'],
-            'L3': ['L5','L8'],
-            'L4': [155,155],
-            'L5': ['L3','L8'],
-            'L6': ['L2','L7'],
-            'L7': ['L2','L6'],
-            'L8': ['L3','L5'],
-            'LC': ['L7','L8'],
-            'M1': [0,0],
-            'M2': ['M6','M7'],
-            'M3': ['M5','M8'],
-            'M4': [155,155],
-            'M5': ['M3','M8'],
-            'M6': ['M2','M7'],
-            'M7': ['M2','M6'],
-            'M8': ['M3','M5'],
-            'MC': ['M7','M8'],
-            'R1': [0,0],
-            'R2': ['R6','R7'],
-            'R3': ['R5','R8'],
-            'R4': ['R3','R5'],
-            'R5': ['R3','R8'],
-            'R6': ['R2','R7'],
-            'R7': ['R2','R6'],
-            'R8': ['R3','R5'],
-            'RC': ['R7','R8'],
-        }    
-    if '-L' in col:
-        lm1, lm2 = rules[col[:2]]
-        try:
-            lm1 = row[lm1+'-L']
-            lm2 = row[lm2+'-L']
-        except:
-            pass
-    if '-R' in col:
-        lm1, lm2 = rules[col[:2]]
-        try:
-            lm1 = row[lm1+'-L']
-            lm2 = row[lm2+'-L']    
-        except:
-            pass
-    return (lm1+lm2)//2
-
-def detect_landmarks_with_rules(df):
-    df = df.copy()
-    for i, row in df.iterrows():
-        for col, val in row.items():
-            if col != 'image_name' and col != 'strabismus':
-                if val != val: # check for nan values
-                    print('warning!!... %s != val'%(val))
-                    print('replace %s from loc [%s:%s] with %s  val'%(df.loc[i,col],i,col,fill_w_rules(row,col)))
-                    
-                    df.loc[i,col] = fill_w_rules(row,col)
-    return df
 
 def add_eye_ratio_com(df,save_path=None):
     gazes = ['M','L','R']
@@ -178,9 +115,9 @@ def add_eye_ratio_com(df,save_path=None):
             except:
                 pass  
     return df
+
 def final_preprocess(old_df,new_df,file_name=None):
     for i,row in old_df.iterrows():
-
         # get index that have matching image_name between old_df and new_df
         index = new_df[new_df['image_name'] == row['image_name'][:-5]].index.values.astype(int)[0]    
         image_name = row['image_name']
@@ -206,11 +143,11 @@ def final_preprocess(old_df,new_df,file_name=None):
             elif cls_name == 'L7':
                 new_df.loc[index, 'L7-L'] = x
             elif cls_name == 'L8':
-                new_df.loc[index, 'L8-L'] = x
+                new_df.loc[index, 'L8-L'] = x 
             elif cls_name == 'L9':
-                new_df.loc[index, 'LC-L'] = x     
+                new_df.loc[index, 'LC-L'] = x      
             elif cls_name == 'LC':
-                new_df.loc[index, 'LC-L'] = x             
+                new_df.loc[index, 'LC-L'] = x   
             elif cls_name == 'M1':
                 new_df.loc[index, 'M1-L'] = x
             elif cls_name == 'M2':
@@ -274,7 +211,7 @@ def final_preprocess(old_df,new_df,file_name=None):
             elif cls_name == 'L8':
                 new_df.loc[index, 'L8-R'] = x 
             elif cls_name == 'L9':
-                new_df.loc[index, 'LC-R'] = x
+                new_df.loc[index, 'LC-R'] = x     
             elif cls_name == 'LC':
                 new_df.loc[index, 'LC-R'] = x     
             elif cls_name == 'M1':
@@ -323,9 +260,6 @@ def final_preprocess(old_df,new_df,file_name=None):
             # print(index,'&',cls_name)
             # print()
     
-    new_df = detect_landmarks_with_rules(new_df)        
-    if file_name != None:
-        new_df.to_pickle(file_name)
     return new_df
 
 def predict_strabismus(pred_input,models):
@@ -361,3 +295,58 @@ def predict_strabismus(pred_input,models):
     
     strabismus = average_proba[0][1]>average_proba[0][0]
     return [strabismus, average_proba.tolist()[0]]
+
+# Geometric Priors (mean eye shape) to fill in missing landmarks
+# Geometric Priors (mean eye shape) to fill in missing landmarks
+def procrustes_1d_nan(target, source):
+    """
+    Aligns 1D array 'source' to 1D array 'target' (with possible NaNs) using
+    optimal scale + translation. Returns aligned source and disparity.
+    Only positions where both arrays are valid (non-NaN) are used.
+    """
+    target = np.asarray(target).flatten()
+    source = np.asarray(source).flatten()
+
+    if target.shape != source.shape:
+        raise ValueError("Arrays must have the same shape.")
+
+    # Create mask where both arrays have valid numbers
+    valid_mask = ~np.isnan(target) & ~np.isnan(source)
+
+    if valid_mask.sum() == 0:
+        raise ValueError("No overlapping valid data points (both arrays have NaNs everywhere).")
+
+    t_valid = target[valid_mask]
+    s_valid = source[valid_mask]
+
+    # Center both valid parts
+    t_mean = t_valid.mean()
+    s_mean = s_valid.mean()
+    t_centered = t_valid - t_mean
+    s_centered = s_valid - s_mean
+
+    # Compute optimal scaling factor
+    numerator = np.sum(t_centered * s_centered)
+    denominator = np.sum(s_centered ** 2)
+    scale = numerator / denominator if denominator != 0 else 0
+
+    # Align entire source array (including NaNs) using global scale & translation
+    aligned_source = (source - s_mean) * scale + t_mean
+    aligned_source = aligned_source.reshape(-1, 1)
+    
+    # Compute disparity only on valid points
+    disparity = np.sum((t_valid - aligned_source[valid_mask]) ** 2)
+    
+    # detect and replace missing landmarks
+    detected = target.copy()
+    present_mask = ~np.isnan(detected[:])
+    detected = detected.reshape(-1, 1)
+    # If too many points missing, estimation might not be reliable
+    if np.sum(present_mask) < 3:
+        print("Too few landmarks to estimate reliably.")
+        return detected
+
+    # Replace missing points in detected landmarks with corresponding transformed mean
+    detected[~present_mask] = aligned_source[~present_mask]
+
+    return detected

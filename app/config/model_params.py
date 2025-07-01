@@ -2,9 +2,9 @@ from functools import lru_cache
 from pydantic_settings import BaseSettings
 
 # class dictionaries
-cls_L_dict: dict = {0:'L1',1:'L2',2:'L3',3:'L4',4:'L5',5:'L6',6:'L7',7:'L8',8:'L9'}
-cls_M_dict: dict = {0:'M1',1:'M2',2:'M3',3:'M4',4:'M5',5:'M6',6:'M7',7:'M8',8:'M9'}   
-cls_R_dict: dict = {0:'R1',1:'R2',2:'R3',3:'R4',4:'R5',5:'R6',6:'R7',7:'R8',8:'R9'}
+cls_L_dict: dict = {0:'L1',1:'L2',2:'L3',3:'L4',4:'L5',5:'L6',6:'L7',7:'L8',8:'LC'}
+cls_M_dict: dict = {0:'M1',1:'M2',2:'M3',3:'M4',4:'M5',5:'M6',6:'M7',7:'M8',8:'MC'} 
+cls_R_dict: dict = {0:'R1',1:'R2',2:'R3',3:'R4',4:'R5',5:'R6',6:'R7',7:'R8',8:'RC'}
 
 #new ratio
 ratio_com: list = ['image_name','strabismus',

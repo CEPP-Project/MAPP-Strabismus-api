@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.utils.files.validate import validate_file_size_type
 from app.utils.files.file_handler import save_upload_file, remove_upload_file
 from app.utils.files.image_utils import crop_and_save_upload_file
-from app.utils.model_predict import RTDETR_prediction, prediction_preprocess, create_empty_df, final_preprocess, add_eye_ratio_com, read_latest_file, predict_strabismus
+from app.utils.model_predict import RTDETR_prediction, prediction_preprocess, create_empty_df, final_preprocess, add_eye_ratio_com, read_latest_file, predict_strabismus, procrustes_1d_nan
 from app.config.config import get_settings
 from app.config.model_params import get_model_settings
 from app.db.database import get_db
@@ -65,32 +65,45 @@ async def detect_strabismus(files: list[UploadFile], authorization: Annotated[st
         prepro2_L = final_preprocess(prepro1_L.copy(),pivot_L.copy())
         prepro2_M = final_preprocess(prepro1_M.copy(),pivot_M.copy())
         prepro2_R = final_preprocess(prepro1_R.copy(),pivot_R.copy())
-        df_list = [prepro2_L,prepro2_M,prepro2_R]
-
+        
         # preprocessing data III
-        combine_df = pd.DataFrame(columns=model_settings.col_names)
-        for df in df_list:
-            for col in model_settings.col_names:
-                try:
-                    combine_df[col] = df[col]
-                except:
-                    pass
+        ### Geometric Priors (mean eye shape) to fill in missing landmarks ###
+
+        dataframe_trimmed_avg = pd.read_pickle(read_latest_file(settings.ML_PATH,'dataframe_trimmed_avg'))
+        df_new_data_L = prepro2_L.iloc[:,2:].T
+        df_new_data_M = prepro2_M.iloc[:,2:].T
+        df_new_data_R = prepro2_R.iloc[:,2:].T
+        df_new_data = pd.concat([df_new_data_L,df_new_data_M,df_new_data_R])
+        dataframe_trimmed_avg['detect_eye'] = df_new_data
+
+        df1 = dataframe_trimmed_avg.iloc[:, 0:1] 
+        df2 = dataframe_trimmed_avg.iloc[:, 1:2] 
+        df2['detect_eye'] = pd.to_numeric(df2['detect_eye'], errors='coerce')
+
+        mean_eye_shape = df1.to_numpy()
+        detected_landmarks = df2.to_numpy()
+        
+        filled_landmarks =  procrustes_1d_nan(detected_landmarks, mean_eye_shape)
+
+        combine_df = pd.DataFrame(filled_landmarks[:,0],index = df1.index).T
+        combine_df.insert(0,'image_name','App')
+        combine_df.insert(1,'strabismus',prepro2_M['strabismus'])
 
         # preprocessing data IV
         final_combine = combine_df.copy()
-        final_combine = add_eye_ratio_com(final_combine)
+        final_combine = add_eye_ratio_com(final_combine,settings.ML_PATH)
         final_combine = final_combine[model_settings.ratio_com]
         final_combine.dropna(inplace=True)
 
         # predict strabismus with top MLs
         preidct_image = final_combine.head(1).drop(columns=['image_name','strabismus']).copy()
         topml = pd.read_pickle(read_latest_file(settings.ML_PATH,'topml[DT-RF-KNN]'))
-        strabismus_prediction = predict_strabismus(preidct_image,topml) #result = [True/False, %AvgConfidence]
-        if strabismus_prediction[0] == 'Undetectable':
+        result = predict_strabismus(preidct_image,topml) #result = [True/False, %AvgConfidence]
+        if result[0] == 'Undetectable':
             return {'error': 'Undetectable'}
         
-        print("strabismus result =", strabismus_prediction)
-        result = [bool(strabismus_prediction[0]), [float(x) for x in strabismus_prediction[1]]]
+        print("strabismus result =", result)
+        result = [bool(result[0]), [float(x) for x in result[1]]]
 
     # Error logging
     except KeyError as error:
